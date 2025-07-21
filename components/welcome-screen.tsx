@@ -87,8 +87,6 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
             <CardContent>
               <ul className="text-sm text-gray-600 space-y-2">
                 <li>• Trouve un maximum de mots attendus</li>
-                <li>• Score basé sur la base de données</li>
-                <li>• Idéal pour réviser</li>
                 <li>• Progression personnelle</li>
               </ul>
               <Button className="w-full mt-4 bg-transparent" variant="outline">
