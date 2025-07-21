@@ -4,11 +4,12 @@ import { useState } from "react"
 import WelcomeScreen from "@/components/welcome-screen"
 import GameSetup from "@/components/game-setup"
 import SoloGame from "@/components/solo-game"
-import MultiplayerLobby from "@/components/multiplayer-lobby"
-import MultiplayerGame from "@/components/multiplayer-game"
 import CreativeMode from "@/components/creative-mode"
 import GameResults from "@/components/game-results"
+import RealMultiplayerLobby from "@/components/real-multiplayer-lobby"
+import RealMultiplayerGame from "@/components/real-multiplayer-game"
 
+// Modifier la définition du type GameMode
 export type GameMode = "solo" | "multiplayer" | "creative"
 export type Theme = "all" | "prevention" | "securite" | "sante" | "risque" | "accidents" | "maladie-pro"
 export type TimeLimit = 30 | 60 | 90
@@ -59,26 +60,37 @@ export interface GameState {
   gameFinished: boolean
 }
 
-type GameScreen = "welcome" | "setup" | "solo" | "multiplayer-lobby" | "multiplayer-game" | "creative" | "results"
+type GameScreen =
+  | "welcome"
+  | "setup"
+  | "solo"
+  | "multiplayer-lobby"
+  | "multiplayer-game"
+  | "creative"
+  | "results"
+  | "real-multiplayer-lobby"
+  | "real-multiplayer-game"
 
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState<GameScreen>("welcome")
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null)
   const [gameSession, setGameSession] = useState<GameSession | null>(null)
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
+  const [realRoomId, setRealRoomId] = useState<string>("")
 
   const handleModeSelect = (mode: GameMode) => {
     setCurrentScreen("setup")
     setGameConfig({ ...gameConfig, mode } as GameConfig)
   }
 
+  // Modifier la fonction handleGameStart pour utiliser le mode multijoueur en ligne
   const handleGameStart = (config: GameConfig) => {
     setGameConfig(config)
 
     if (config.mode === "solo") {
       setCurrentScreen("solo")
     } else if (config.mode === "multiplayer") {
-      setCurrentScreen("multiplayer-lobby")
+      setCurrentScreen("real-multiplayer-lobby")
     } else if (config.mode === "creative") {
       setCurrentScreen("creative")
     }
@@ -94,8 +106,10 @@ export default function Home() {
     setGameConfig(null)
     setGameSession(null)
     setCurrentPlayer(null)
+    setRealRoomId("")
   }
 
+  // Modifier la fonction renderScreen pour supprimer le cas "multiplayer-lobby" et "multiplayer-game"
   const renderScreen = () => {
     switch (currentScreen) {
       case "welcome":
@@ -110,24 +124,44 @@ export default function Home() {
         )
       case "solo":
         return <SoloGame config={gameConfig!} onGameEnd={handleGameEnd} onBack={() => setCurrentScreen("setup")} />
-      case "multiplayer-lobby":
-        return (
-          <MultiplayerLobby
-            config={gameConfig!}
-            onGameStart={(session, player) => {
-              setGameSession(session)
-              setCurrentPlayer(player)
-              setCurrentScreen("multiplayer-game")
-            }}
-            onBack={() => setCurrentScreen("setup")}
-          />
-        )
-      case "multiplayer-game":
-        return <MultiplayerGame session={gameSession!} player={currentPlayer!} onGameEnd={handleGameEnd} />
       case "creative":
         return <CreativeMode config={gameConfig!} onGameEnd={handleGameEnd} onBack={() => setCurrentScreen("setup")} />
       case "results":
         return <GameResults session={gameSession!} config={gameConfig!} onRestart={handleRestart} />
+      case "real-multiplayer-lobby":
+        return (
+          <RealMultiplayerLobby
+            config={gameConfig!}
+            onGameStart={(roomId, player) => {
+              setRealRoomId(roomId)
+              setCurrentPlayer(player)
+              setCurrentScreen("real-multiplayer-game")
+            }}
+            onBack={() => setCurrentScreen("setup")}
+          />
+        )
+      case "real-multiplayer-game":
+        return (
+          <RealMultiplayerGame
+            roomId={realRoomId}
+            player={currentPlayer!}
+            onGameEnd={() => {
+              // Simuler une session pour les résultats
+              const simulatedSession: GameSession = {
+                id: realRoomId,
+                config: gameConfig!,
+                players: [currentPlayer!],
+                currentRound: 0,
+                currentKeyword: "",
+                expectedWords: [],
+                roundResults: [],
+                gameFinished: true,
+              }
+              handleGameEnd(simulatedSession)
+            }}
+            onBack={() => setCurrentScreen("setup")}
+          />
+        )
       default:
         return <WelcomeScreen onModeSelect={handleModeSelect} />
     }
