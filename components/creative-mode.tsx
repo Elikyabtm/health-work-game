@@ -211,7 +211,6 @@ export default function CreativeMode({ config, onGameEnd, onBack }: CreativeMode
                 <h4 className="font-medium mb-2">🎯 Exemples d'usage :</h4>
                 <ul className="space-y-1 text-gray-600">
                   <li>• Formation en entreprise</li>
-                  <li>• Révision avant examen</li>
                   <li>• Animation d'équipe</li>
                   <li>• Évaluation des connaissances</li>
                 </ul>
