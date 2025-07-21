@@ -19,7 +19,6 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
             🧠 C'est quoi la définition ?
           </h1>
           <p className="text-xl text-gray-600 mb-2">Jeu d'association de mots - Santé & Sécurité au Travail</p>
-          <p className="text-lg text-gray-500">Inspiré de Just One, Gartic Phone et JetPunk</p>
         </div>
 
         {/* Features */}
@@ -69,7 +68,6 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
                   <li>• Pense aux synonymes et termes techniques</li>
                   <li>• Les accents et pluriels sont automatiquement pris en compte</li>
                   <li>• En multijoueur : les mots communs donnent des points</li>
-                  <li>• Parfait pour réviser ou animer une formation</li>
                 </ul>
               </div>
             </div>
@@ -108,7 +106,7 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
                 <Users className="h-8 w-8 text-purple-600" />
               </div>
               <CardTitle className="text-xl">Mode Multijoueur</CardTitle>
-              <CardDescription>2 à 6 joueurs - Mots communs = points</CardDescription>
+              <CardDescription>Jouable de 2 à 6 joueurs</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="text-sm text-gray-600 space-y-2">
