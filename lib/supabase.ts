@@ -1,19 +1,11 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Vérifier que les variables d'environnement sont définies
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// ⚠️ Assure-toi que ces variables sont bien définies dans Vercel > Project Settings > Environment Variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-if (!supabaseUrl) {
-  console.error("NEXT_PUBLIC_SUPABASE_URL is not defined")
-}
-
-if (!supabaseKey) {
-  console.error("NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined")
-}
-
-// Créer le client Supabase seulement si les variables sont définies
-export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
+// ✅ Créer le client Supabase (même si les variables ne sont pas définies en local, ce sera une erreur visible)
+export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Types pour la base de données
 export interface GameRoom {
@@ -39,7 +31,7 @@ export interface PlayerAnswer {
   submitted_at: string
 }
 
-// Fonction utilitaire pour vérifier si Supabase est disponible
+// Fonction utilitaire
 export const isSupabaseAvailable = () => {
-  return supabase !== null
+  return Boolean(supabaseUrl) && Boolean(supabaseKey)
 }

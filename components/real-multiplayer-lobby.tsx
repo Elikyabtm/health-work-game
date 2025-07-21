@@ -9,6 +9,7 @@ import type { GameConfig, Player } from "@/app/page"
 import { ArrowLeft, Copy, Crown, Play, UserPlus, AlertCircle } from "lucide-react"
 import { supabase, isSupabaseAvailable } from "@/lib/supabase"
 
+
 interface RealMultiplayerLobbyProps {
   config: GameConfig
   onGameStart: (roomId: string, player: Player) => void
@@ -64,81 +65,85 @@ export default function RealMultiplayerLobby({ config, onGameStart, onBack }: Re
   }
 
   // 🔁 Abonnement en temps réel
-  useEffect(() => {
-    if (!roomId || !currentPlayer) return
-    const unsubscribe = subscribeToRoom(roomId)
-    return () => {
-      if (unsubscribe) unsubscribe()
-    }
-  }, [roomId, currentPlayer])
+useEffect(() => {
+  if (!roomId || !supabase || !currentPlayer) return
+
+  const unsubscribe = subscribeToRoom(roomId)
+
+  return () => {
+    if (unsubscribe) unsubscribe()
+  }
+}, [roomId, currentPlayer])
 
   // ✅ S'abonner aux mises à jour de la room
-  const subscribeToRoom = (targetRoomId: string) => {
-    if (!supabase) return
+ const subscribeToRoom = (targetRoomId: string) => {
+  const channel = supabase
+    .channel(`room-${targetRoomId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "game_rooms",
+        filter: `id=eq.${targetRoomId}`,
+      },
+      (payload) => {
+        const updatedRoom = payload.new as any
+        setPlayers(updatedRoom.players || [])
 
-    const channel = supabase
-      .channel(`room-${targetRoomId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "game_rooms",
-          filter: `id=eq.${targetRoomId}`,
-        },
-        (payload) => {
-          const updatedRoom = payload.new as any
-          console.log("🎯 Mise à jour reçue :", updatedRoom)
-          setPlayers(updatedRoom.players || [])
-
-          if (updatedRoom.current_keyword && !updatedRoom.game_finished) {
-            onGameStart(targetRoomId, currentPlayer!)
-          }
+        // Si le jeu a commencé
+        if (updatedRoom.current_keyword && !updatedRoom.game_finished) {
+          onGameStart(targetRoomId, currentPlayer!)
         }
-      )
-      .subscribe()
+      }
+    )
+    .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
-    }
+  // 👉 retourne une fonction de nettoyage
+  return () => {
+    supabase.removeChannel(channel)
   }
+}
 
   // Créer une room
-  const createRoom = async () => {
-    if (!playerName.trim() || !supabase) return
+ const createRoom = async () => {
+  if (!playerName.trim() || !supabase) return
 
-    const newRoomId = Math.random().toString(36).substring(2, 8).toUpperCase()
+  const newRoomId = Math.random().toString(36).substring(2, 8).toUpperCase()
 
-    const newPlayer: Player = {
-      id: Math.random().toString(36).substring(2),
-      name: playerName.trim(),
-      score: 0,
-      isHost: true,
-    }
-
-    try {
-      const { error } = await supabase.from("game_rooms").insert({
-        id: newRoomId,
-        config,
-        players: [newPlayer],
-        current_round: 1,
-        current_keyword: "",
-        expected_words: [],
-        round_results: [],
-        game_finished: false,
-      })
-
-      if (error) throw error
-
-      setRoomId(newRoomId)
-      setCurrentPlayer(newPlayer)
-      setPlayers([newPlayer])
-      setIsHost(true)
-    } catch (error) {
-      console.error("Erreur lors de la création de la room:", error)
-      alert("Erreur lors de la création de la partie")
-    }
+  const newPlayer: Player = {
+    id: Math.random().toString(36).substring(2),
+    name: playerName.trim(),
+    score: 0,
+    isHost: true,
   }
+
+  try {
+    const { error } = await supabase.from("game_rooms").insert({
+      id: newRoomId,
+      config,
+      players: [newPlayer],
+      current_round: 1,
+      current_keyword: "",
+      expected_words: [],
+      round_results: [],
+      game_finished: false,
+    })
+
+    if (error) throw error
+
+    setRoomId(newRoomId)
+    setCurrentPlayer(newPlayer)
+    setPlayers([newPlayer])
+    setIsHost(true)
+
+    // ✅ AJOUTE CETTE LIGNE :
+    subscribeToRoom(newRoomId)
+  } catch (error) {
+    console.error("Erreur lors de la création de la room:", error)
+    alert("Erreur lors de la création de la partie")
+  }
+}
 
   // Rejoindre une room
   const joinRoom = async (targetRoomId: string) => {
