@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { GameMode } from "@/app/page"
-import { Brain, Lightbulb, Trophy, Clock, Target, Wifi } from "lucide-react"
+import { Brain, Users, Lightbulb, Trophy, Clock, Target } from "lucide-react"
 
 interface WelcomeScreenProps {
   onModeSelect: (mode: GameMode) => void
@@ -78,10 +78,7 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
 
         {/* Game Modes */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Card
-            className="hover:shadow-lg transition-shadow cursor-pointer group flex flex-col"
-            onClick={() => onModeSelect("solo")}
-          >
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => onModeSelect("solo")}>
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 p-3 bg-indigo-100 rounded-full w-fit group-hover:bg-indigo-200 transition-colors">
                 <Brain className="h-8 w-8 text-indigo-600" />
@@ -89,8 +86,8 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
               <CardTitle className="text-xl">Mode Solo</CardTitle>
               <CardDescription>Joue seul(e) et révise tes connaissances</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <ul className="text-sm text-gray-600 space-y-2 flex-1">
+            <CardContent>
+              <ul className="text-sm text-gray-600 space-y-2">
                 <li>• Trouve un maximum de mots attendus</li>
                 <li>• Score basé sur la base de données</li>
                 <li>• Idéal pour réviser</li>
@@ -103,31 +100,31 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
           </Card>
 
           <Card
-            className="hover:shadow-lg transition-shadow cursor-pointer group flex flex-col"
+            className="hover:shadow-lg transition-shadow cursor-pointer group"
             onClick={() => onModeSelect("multiplayer")}
           >
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit group-hover:bg-green-200 transition-colors">
-                <Wifi className="h-8 w-8 text-green-600" />
+              <div className="mx-auto mb-4 p-3 bg-purple-100 rounded-full w-fit group-hover:bg-purple-200 transition-colors">
+                <Users className="h-8 w-8 text-purple-600" />
               </div>
-              <CardTitle className="text-xl">Multijoueur</CardTitle>
-              <CardDescription>Joue en ligne avec tes amis</CardDescription>
+              <CardTitle className="text-xl">Mode Multijoueur</CardTitle>
+              <CardDescription>2 à 6 joueurs - Mots communs = points</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <ul className="text-sm text-gray-600 space-y-2 flex-1">
-                <li>• Vrais joueurs en ligne</li>
-                <li>• Partage de code de partie</li>
-                <li>• Synchronisation en temps réel</li>
-                <li>• Mots communs = points</li>
+            <CardContent>
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li>• Chaque joueur écrit ses mots</li>
+                <li>• Mots communs donnent des points</li>
+                <li>• Coopération et intuition</li>
+                <li>• Session partageable par URL</li>
               </ul>
               <Button className="w-full mt-4 bg-transparent" variant="outline">
-                Jouer en ligne
+                Créer une partie
               </Button>
             </CardContent>
           </Card>
 
           <Card
-            className="hover:shadow-lg transition-shadow cursor-pointer group flex flex-col"
+            className="hover:shadow-lg transition-shadow cursor-pointer group"
             onClick={() => onModeSelect("creative")}
           >
             <CardHeader className="text-center">
@@ -137,8 +134,8 @@ export default function WelcomeScreen({ onModeSelect }: WelcomeScreenProps) {
               <CardTitle className="text-xl">Mode Créatif</CardTitle>
               <CardDescription>Crée tes propres mots-clés</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <ul className="text-sm text-gray-600 space-y-2 flex-1">
+            <CardContent>
+              <ul className="text-sm text-gray-600 space-y-2">
                 <li>• Ajoute tes propres mots-clés</li>
                 <li>• Parfait pour les formateurs</li>
                 <li>• Contenu personnalisé</li>
